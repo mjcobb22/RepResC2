@@ -1,0 +1,67 @@
+---
+title: "Storm data re"
+author: "MCobb"
+date: "4/14/2021"
+output: html_document
+---
+
+## Analyze NOAA storm data 
+
+##Load libraries and data
+#load downloaded 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(ggplot2)
+library(data.table)
+library(lubridate)
+
+csv <- read.csv("./repdata_data_StormData.csv.bz2")
+```
+
+## Processing Data
+
+#converting BGN_DATE to month to allow for analysis at month level
+
+```{r month}
+#convert date to usable format
+csv$BGN_DATE <- as.POSIXlt(csv$BGN_DATE, format="%m/%d/%Y")
+
+#get month of BGN_DATE
+csv$month<-month(csv$BGN_DATE)
+#get month and year of BGN_DATE
+csv %<>% mutate(MonYear = zoo::as.yearmon(BGN_DATE))
+
+totalbymonth <- aggregate(cbind(FATALITIES,INJURIES)~MonYear,
+                     data=csv,FUN=sum)
+
+meanbymonth <- aggregate(cbind(FATALITIES,INJURIES)~MonYear,
+                     data=csv,FUN=mean)
+
+```
+
+
+```{r Fatalities}
+
+t <- ggplot(totalbymonth, aes(MonYear, FATALITIES))
+t+geom_line()+geom_smooth(method = "lm")+coord_cartesian(ylim = c(0, 350))
+
+```
+
+
+```{r injuries}
+
+t <- ggplot(totalbymonth, aes(MonYear, FATALITIES))
+t+geom_line()+geom_smooth(method = "lm")
+#+coord_cartesian(ylim = c(0, 350))
+
+```
+
+
+```{r month}
+
+t <- ggplot(totalbymonth, aes(MonYear, FATALITIES))
+t+geom_line()+geom_smooth(method = "lm")
+#+coord_cartesian(ylim = c(0, 350))
+
+```
